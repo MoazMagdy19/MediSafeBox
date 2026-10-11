@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MediSafe Box — لانش بوكس الدواء الذكي لتيتا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon" aria-hidden="true">💊</span>
+    <div>
+      <h1>MediSafe Box</h1>
+      <p>لانش بوكس الدواء الذكي لتيتا</p>
+    </div>
+  </div>
+  <nav class="nav" aria-label="التنقل">
+    <a href="#home">الرئيسية</a>
+    <a href="#box">الصندوق</a>
+    <a href="#log">السجل</a>
+    <a href="#settings">الإعدادات</a>
+  </nav>
+</header>
+
+<!-- DEMO CONTROLS -->
+<section class="demo-bar" aria-label="أدوات العرض">
+  <div class="demo-row">
+    <button id="btn-fast" class="btn btn-fast" aria-pressed="false">⚡ وضع العرض السريع</button>
+    <span id="fast-badge" class="fast-badge" hidden>وضع العرض السريع مفعل — 1 ثانية = 1 دقيقة</span>
+    <button id="btn-sound" class="btn btn-ghost" aria-pressed="false">🔇 الصوت: إيقاف</button>
+    <button id="btn-reset" class="btn btn-ghost">↺ إعادة ضبط العرض</button>
+  </div>
+  <div class="demo-row">
+    <span class="demo-label">تشغيل موعد الدواء الآن:</span>
+    <div id="triggers" class="triggers"></div>
+  </div>
+</section>
+
+<main>
+
+  <!-- HOME -->
+  <section id="home" class="grid-home">
+    <div class="card user-card">
+      <div class="avatar" aria-hidden="true">👵</div>
+      <div class="user-info">
+        <span class="label">المستخدم</span>
+        <h2>تيتا</h2>
+      </div>
+      <div class="clock-box">
+        <span id="clock" class="clock num">07:58</span>
+        <small>الوقت في العرض (محاكاة)</small>
+      </div>
+    </div>
+
+    <div id="reminder" class="card reminder" data-state="idle">
+      <h2 id="rem-title" class="rem-title">في انتظار موعد الدواء</h2>
+      <div id="rem-med" class="rem-med"></div>
+      <div id="rem-slot" class="rem-slot"></div>
+      <p id="rem-msg" class="rem-msg"></p>
+
+      <div id="rem-steps" class="steps" aria-label="مراحل التنبيه">
+        <div class="step" data-state="todo"><b>0 د</b><span>🔔 LED + جرس</span></div>
+        <div class="step" data-state="todo"><b>5 د</b><span>📱 تنبيه للعائلة</span></div>
+        <div class="step" data-state="todo"><b>15 د</b><span>🔴 الجرعة فاتت</span></div>
+      </div>
+      <div class="bar"><div id="rem-bar" class="bar-fill"></div></div>
+      <div id="rem-elapsed" class="rem-elapsed"></div>
+
+      <div class="rem-actions">
+        <button id="btn-take" class="btn btn-big btn-take">💊 أخذت الدواء</button>
+        <button id="btn-snooze" class="btn btn-big btn-snooze">⏰ تذكير لاحقًا</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODAY -->
+  <section id="today">
+    <h2 class="sec-title">💊 أدوية اليوم</h2>
+    <div id="med-cards" class="cards3"></div>
+  </section>
+
+  <!-- SMART BOX -->
+  <section id="box">
+    <h2 class="sec-title">🧰 الصندوق الذكي</h2>
+    <div class="card box-card">
+      <div class="smartbox">
+        <div id="box-comps" class="box-comps"></div>
+        <div class="box-front">
+          <span class="box-brand">MediSafe Box</span>
+          <span id="box-speaker" class="speaker" data-on="0" aria-label="جرس الصندوق">
+            <i></i><i></i><i></i>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-hw">
+      <!-- SENSOR -->
+      <div id="sensor-card" class="card sensor-card" data-state="waiting">
+        <h3>Sensor Status</h3>
+        <div class="sensor-icon" id="sensor-icon">🔘</div>
+        <div class="sensor-name">Medication Sensor</div>
+        <div id="sensor-text" class="sensor-text">في انتظار فتح الخانة...</div>
+        <div id="sensor-sub" class="sensor-sub"></div>
+        <button id="btn-open" class="btn btn-big btn-sensor">🔓 محاكاة فتح الخانة</button>
+        <p class="hint">يمثل مفتاح Micro Switch / حساس ضغط أسفل الدواء.</p>
+      </div>
+
+      <!-- OLED -->
+      <div class="card oled-card">
+        <h3>شاشة OLED</h3>
+        <div id="oled" class="oled" data-state="idle">
+          <div class="o-title">MediSafe Box</div>
+          <div id="oled-body" class="o-body"></div>
+        </div>
+      </div>
+
+      <!-- HARDWARE -->
+      <div class="card hw-card">
+        <h3>حالة العتاد (محاكاة)</h3>
+        <div id="hw-leds" class="hw-leds"></div>
+        <div id="hw-buzzer" class="hw-row hw-buzzer" data-on="0">
+          <span class="hw-ico">🔊</span><span class="hw-label">Buzzer</span><span id="hw-buzzer-val" class="hw-val">OFF</span>
+        </div>
+        <div id="hw-lock" class="hw-row hw-lock" data-open="0">
+          <span class="hw-ico" id="hw-lock-ico">🔒</span><span class="hw-label">Motor / Lock</span><span id="hw-lock-val" class="hw-val">مغلق</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG + FAMILY + SUMMARY -->
+  <section id="log" class="grid-log">
+    <div class="card">
+      <h2 class="sec-title in-card">📋 سجل الجرعات</h2>
+      <div id="hist-chips" class="chips"></div>
+      <div id="hist-list" class="hist-list"></div>
+    </div>
+
+    <div class="stack">
+      <div id="fam-card" class="card fam-card" data-state="ok">
+        <h2 class="sec-title in-card">📱 Family Alert</h2>
+        <div class="fam-who"><span class="fam-avatar" aria-hidden="true">👩</span><b>ماما</b></div>
+        <div id="fam-chip" class="status-pill fam-chip">🟢 لا توجد تنبيهات</div>
+        <p id="fam-text" class="fam-text">كل شيء على ما يرام</p>
+        <div id="fam-sent" class="fam-sent"></div>
+        <div id="fam-msgs" class="fam-msgs"></div>
+        <p class="hint">محاكاة فقط — لا يتم الاتصال بـ Telegram.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="sec-title in-card">📊 ملخص اليوم</h2>
+        <ul class="sum-list">
+          <li>💊 الجرعات المطلوبة: <b id="sum-total">3</b></li>
+          <li>🟢 تم تناولها: <b id="sum-taken">0</b></li>
+          <li>🔴 جرعات فائتة: <b id="sum-missed">0</b></li>
+          <li>⏳ جرعات قادمة: <b id="sum-pending">3</b></li>
+          <li>📊 نسبة الالتزام: <b id="sum-pct">0%</b></li>
+        </ul>
+        <div class="progress" aria-label="نسبة الالتزام">
+          <div id="prog-taken" class="prog-taken"></div>
+          <div id="prog-missed" class="prog-missed"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings">
+    <h2 class="sec-title">⚙️ Medication Settings — إعدادات الأدوية</h2>
+    <div class="card">
+      <div id="settings-list" class="settings-list"></div>
+      <p class="hint">يمكنك تعديل اسم الدواء ووقته وخانته. هذا النموذج لا يقترح ولا يحسب أي جرعات طبية.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  نموذج أولي للواجهة فقط — كل الأجهزة والإشعارات (ESP32 / Telegram / Google Sheets) تتم محاكاتها داخل المتصفح.
+</footer>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
